@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,9 +34,12 @@ public class Planner {
     public static void main(String[] args) {
         System.setProperty("http.agent", "");
         long startTime = System.currentTimeMillis();
-        String courseId = args[0];
         Course course;
         try {
+            if(args.length==0){
+                throw new Exception("Please enter the course id as an argument!");
+            }
+            String courseId = args[0];
             course = new Course(courseId);
             HashSet<String> lectureList = course.getRelatedLectures();
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -56,10 +60,12 @@ public class Planner {
             course.printNextTenLectures();
             long endTime = System.currentTimeMillis();
             System.out.format("Showing 10 of %d lectures in %.2f secs",course.size(),(double)(endTime-startTime)/1000);
-        } catch (Exception e) {
+        } catch (IOException e){
+            System.out.println("ERROR: Can't retrieve data - make sure you are connected to the internet!");
+        }catch (Exception e) {
             if(DEBUG)
                 e.printStackTrace();
-            System.out.println("ERROR: Can't retrieve data - make sure you are connected to the internet!");
+            System.out.println(e.getMessage());
         }
     }
 }
